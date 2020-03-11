@@ -29,7 +29,7 @@ class App extends React.Component {
       isOponent2: false,
       isFailed: false,
       isMusic: true,
-      disable:true
+      disable:false
     };
     (this.oponentPosition = new Animated.Value(0)), (this.duration = 5000);
     this.stopTimeout = 3600;
@@ -74,6 +74,7 @@ class App extends React.Component {
       score: 0,
       isPlayerTop: false,
       isFailed: false,
+      disable:true
     });
 
     this._animationBird();
@@ -120,7 +121,7 @@ class App extends React.Component {
           SoundPlayer.playSoundFile('dilwale', 'mp3');
           SoundPlayer.seek(4);
         }
-        this.setState({isStart: false, isFailed: true,disable:true});
+        this.setState({isStart: false, isFailed: true});
         setTimeout(() => {
           this.setState({disable:false})
         }, 1500);
@@ -137,7 +138,7 @@ class App extends React.Component {
           SoundPlayer.playSoundFile('dilwale', 'mp3');
           SoundPlayer.seek(4);
         }
-        this.setState({isStart: false, isFailed: true,disable:true});
+        this.setState({isStart: false, isFailed: true});
         setTimeout(() => {
           this.setState({disable:false})
         }, 1500);
@@ -246,7 +247,7 @@ class App extends React.Component {
                 {'Last Score : ' + this.state.score}
               </Text>
             )}
-            <Text style={styles.textStart}>Tap to start</Text>
+            {!this.state.disable&&<Text style={styles.textStart}>Tap to start</Text>}
           </TouchableOpacity>
         )}
       </SafeAreaView>
