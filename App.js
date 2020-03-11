@@ -31,9 +31,10 @@ class App extends React.Component {
       isMusic: true,
       disable:false
     };
-    (this.oponentPosition = new Animated.Value(0)), (this.duration = 5000);
-    this.stopTimeout = 3600;
-    this.stopTimeout2 = 3900;
+    (this.oponentPosition = new Animated.Value(0)), (this.duration = 3000);
+    this.stopTimeout = 2100;
+    this.stopTimeout2 = 2250;
+    this.stopTimeout3 = 2400;
   }
 
   componentDidMount() {
@@ -94,9 +95,10 @@ class App extends React.Component {
 
     if (parseInt(this.state.score) / count > 500) {
       count = count + 1;
-      this.duration = this.duration - 100;
-      this.stopTimeout = (this.duration * 7.2) / 10;
-      this.stopTimeout2 = (this.duration * 7.8) / 10;
+      this.duration = this.duration - 120;
+      this.stopTimeout = (this.duration * .7);
+      this.stopTimeout2 = (this.duration * .75);
+      this.stopTimeout3 = (this.duration * .8);
     }
 
     this.oponentPosition.setValue(0);
@@ -112,9 +114,10 @@ class App extends React.Component {
 
     setTimeout(() => {
       if (this.state.isPlayerTop == this.state.isOponentTop) {
-        this.duration = 5000;
-        this.stopTimeout = 3600;
-        this.stopTimeout2 = 3900;
+        this.duration = 3000;
+        this.stopTimeout = 2100;
+        this.stopTimeout2 = 2250;
+        this.stopTimeout3 = 2400;
         count = 1;
         SoundPlayer.stop();
         if (this.state.isMusic) {
@@ -127,11 +130,13 @@ class App extends React.Component {
         }, 1500);
       }
     }, this.stopTimeout);
+
     setTimeout(() => {
       if ((this.state.isPlayerTop == this.state.isOponentTop)&&!this.state.isFailed) {
-        this.duration = 5000;
-        this.stopTimeout = 3600;
-        this.stopTimeout2 = 3900;
+        this.duration = 3000;
+        this.stopTimeout = 2100;
+        this.stopTimeout2 = 2250;
+        this.stopTimeout3 = 2400;
         count = 1;
         SoundPlayer.stop();
         if (this.state.isMusic) {
@@ -144,6 +149,25 @@ class App extends React.Component {
         }, 1500);
       }
     }, this.stopTimeout2);
+
+    setTimeout(() => {
+      if ((this.state.isPlayerTop == this.state.isOponentTop)&&!this.state.isFailed) {
+        this.duration = 5000;
+        this.stopTimeout = 2100;
+        this.stopTimeout2 = 2250;
+        this.stopTimeout3 = 2400;
+        count = 1;
+        SoundPlayer.stop();
+        if (this.state.isMusic) {
+          SoundPlayer.playSoundFile('dilwale', 'mp3');
+          SoundPlayer.seek(4);
+        }
+        this.setState({isStart: false, isFailed: true});
+        setTimeout(() => {
+          this.setState({disable:false})
+        }, 1500);
+      }
+    }, this.stopTimeout3);
   };
 
   render() {
@@ -299,8 +323,8 @@ const styles = StyleSheet.create({
   imagePlayer: {
     position: 'absolute',
     height: moderateScale(80),
-    width: moderateScale(100),
-    left: moderateScale(120),
+    width: moderateScale(140),
+    left: moderateScale(80),
     resizeMode: 'stretch',
   },
   animatedOponent: {
