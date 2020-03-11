@@ -118,19 +118,12 @@ class App extends React.Component {
         if (this.state.isMusic) {
           SoundPlayer.playSoundFile('dilwale', 'mp3');
           SoundPlayer.seek(4);
-          setInterval(() => {
-            if (this.state.isMusic && this.state.isFailed) {
-              SoundPlayer.stop();
-              SoundPlayer.playSoundFile('dilwale', 'mp3');
-              SoundPlayer.seek(4);
-            }
-          }, 12000);
         }
         this.setState({isStart: false, isFailed: true});
       }
     }, this.stopTimeout);
     setTimeout(() => {
-      if (this.state.isPlayerTop == this.state.isOponentTop) {
+      if ((this.state.isPlayerTop == this.state.isOponentTop)&&!this.state.isFailed) {
         this.duration = 5000;
         this.stopTimeout = 3600;
         this.stopTimeout2 = 3900;
@@ -139,13 +132,6 @@ class App extends React.Component {
         if (this.state.isMusic) {
           SoundPlayer.playSoundFile('dilwale', 'mp3');
           SoundPlayer.seek(4);
-          setInterval(() => {
-            if (this.state.isMusic && this.state.isFailed) {
-              SoundPlayer.stop();
-              SoundPlayer.playSoundFile('dilwale', 'mp3');
-              SoundPlayer.seek(4);
-            }
-          }, 12000);
         }
         this.setState({isStart: false, isFailed: true});
       }
