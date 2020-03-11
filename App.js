@@ -29,6 +29,7 @@ class App extends React.Component {
       isOponent2: false,
       isFailed: false,
       isMusic: true,
+      disable:true
     };
     (this.oponentPosition = new Animated.Value(0)), (this.duration = 5000);
     this.stopTimeout = 3600;
@@ -119,7 +120,10 @@ class App extends React.Component {
           SoundPlayer.playSoundFile('dilwale', 'mp3');
           SoundPlayer.seek(4);
         }
-        this.setState({isStart: false, isFailed: true});
+        this.setState({isStart: false, isFailed: true,disable:true});
+        setTimeout(() => {
+          this.setState({disable:false})
+        }, 1500);
       }
     }, this.stopTimeout);
     setTimeout(() => {
@@ -133,7 +137,10 @@ class App extends React.Component {
           SoundPlayer.playSoundFile('dilwale', 'mp3');
           SoundPlayer.seek(4);
         }
-        this.setState({isStart: false, isFailed: true});
+        this.setState({isStart: false, isFailed: true,disable:true});
+        setTimeout(() => {
+          this.setState({disable:false})
+        }, 1500);
       }
     }, this.stopTimeout2);
   };
@@ -151,6 +158,7 @@ class App extends React.Component {
             onPress={() =>
               this.setState({isMusic: !this.state.isMusic}, SoundPlayer.stop())
             }
+            disabled={this.state.disable}
             style={styles.touchMusic}>
             <Image
               style={styles.touchMusic}
