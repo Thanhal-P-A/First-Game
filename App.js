@@ -10,176 +10,327 @@ import {
   TouchableOpacity,
   ImageBackground,
   Animated,
-  Easing
+  Easing,
+  AppState,
 } from 'react-native';
+import SoundPlayer from 'react-native-sound-player';
+import {moderateScale} from 'react-native-size-matters';
 
 let count = 1;
 
 class App extends React.Component {
-  constructor(){
-    super()
-    this.state={
-      isStart:false,
-      score:0,
-      cyclePosition:110,
-      birdBottomPosition:110,
-      birdPosition:660,
-      isTop:false,
-      isBirdTop:false,
-      isBird2:false
-    }
-    this.birdPosition=new Animated.Value(0),
-    this.duration=4000;
-    this.stopTimeout=2900;
+  constructor() {
+    super();
+    this.state = {
+      isStart: false,
+      score: 0,
+      isPlayerTop: false,
+      isOponentTop: false,
+      isOponent2: false,
+      isFailed: false,
+      isMusic: true,
+    };
+    (this.oponentPosition = new Animated.Value(0)), (this.duration = 5000);
+    this.stopTimeout = 3600;
+    this.stopTimeout2 = 3900;
   }
 
-  componentDidMount(){
+  componentDidMount() {
+    AppState.addEventListener('change', state => {
+      if (state === 'background') {
+        SoundPlayer.stop();
+      }
+    });
+
     setInterval(() => {
-      if(this.state.isStart){
-      this.setState({
-        score:this.state.score+10
-      })
-    }
+      if (this.state.isStart) {
+        this.setState({
+          score: this.state.score + 10,
+        });
+      }
     }, 100);
+
+    setInterval(() => {
+      if (this.state.isMusic && this.state.isStart) {
+        SoundPlayer.stop();
+        SoundPlayer.playSoundFile('runonly', 'mp3');
+      }
+    }, 6800);
   }
 
-  _onStart=()=>{
-    this.setState({isStart:true,score:0,isTop:false})
-    this._animationBird()
-  }
+  _onStart = () => {
+    SoundPlayer.stop();
 
-_animationBird=()=>{
-  if(Math.random()>.5){
-    this.setState({isBirdTop:true})
-  }
-  else{
-    this.setState({isBirdTop:false})
-  }
-  if(Math.random()>.8){
-    this.setState({isBird2:true})
-  }
-  else{
-    this.setState({isBird2:false})
-  }
-  // console.warn((parseInt(this.state.score)/count),"score",this.state.score,count);
-  if((parseInt(this.state.score)/count)>500){
-    count=count+1
-    this.duration=this.duration-200
-    this.stopTimeout=this.stopTimeout-150
-  }
-  this.birdPosition.setValue(0)
-  Animated.timing(
-    this.birdPosition,
-    {
+    if (this.state.isMusic) {
+      try {
+        SoundPlayer.playSoundFile('run', 'mp3');
+      } catch (e) {
+        console.log(`cannot play the sound file`, e);
+      }
+    }
+    this.setState({
+      isStart: true,
+      score: 0,
+      isPlayerTop: false,
+      isFailed: false,
+    });
+
+    this._animationBird();
+  };
+
+  _animationBird = () => {
+    if (Math.random() > 0.5) {
+      this.setState({isOponentTop: true});
+    } else {
+      this.setState({isOponentTop: false});
+    }
+    if (Math.random() > 0.8) {
+      this.setState({isOponent2: true});
+    } else {
+      this.setState({isOponent2: false});
+    }
+
+    if (parseInt(this.state.score) / count > 500) {
+      count = count + 1;
+      this.duration = this.duration - 100;
+      this.stopTimeout = (this.duration * 7.2) / 10;
+      this.stopTimeout2 = (this.duration * 7.8) / 10;
+    }
+
+    this.oponentPosition.setValue(0);
+    Animated.timing(this.oponentPosition, {
       toValue: 1,
       duration: this.duration,
-      easing: Easing.linear
-    }
-  ).start((o) =>{if(o.finished){ this._animationBird()}})
-
-  setTimeout(() => {
-      if(this.state.isTop==this.state.isBirdTop){
-        this.duration=4000;
-    this.stopTimeout=2900;
-    count=1;
-        this.setState({isStart:false})
-        // this._animationBird()
+      easing: Easing.linear,
+    }).start(o => {
+      if (o.finished) {
+        this._animationBird();
       }
-      else{
-      // this.setState({
-      //   birdPosition:this.state.birdPosition-33,
-      //   // score:this.state.score+10
-      // })
-    }
-    }, this.stopTimeout);
-}
+    });
 
-
-  render(){
-    const birdPosition = this.birdPosition.interpolate({
-      inputRange: [0, 1],
-      outputRange: [720,-90]
-    })
-
-    const birdPosition2 = this.birdPosition.interpolate({
-      inputRange: [0, 1],
-      outputRange: [765,-45]
-    })
-    return (
-      <SafeAreaView style={styles.container} >
-        <StatusBar barStyle="dark-content" backgroundColor="grey" />
-        {
-          this.state.isStart?
-          <TouchableOpacity activeOpacity={1} onPress={()=>this.setState({isTop:!this.state.isTop})}  style={styles.main}>
-          <ImageBackground 
-          style={styles.imageDinausorGif}
-          source={require("./assets/movingRoadRight.gif")}
-          >
-          </ImageBackground>
-          
-            <Image 
-            style={{position:'absolute',height:120,width:90,left:100,bottom:this.state.isTop?220:110}}
-            source={this.state.isTop?require("./assets/marioRight.gif"):require("./assets/marioRight.gif")}/>
-            <Animated.Image 
-            style={{position:'absolute',height:120,width:90,left:birdPosition,bottom:this.state.isBirdTop?200:110}}
-            source={this.state.isBirdTop?require("./assets/birdLeft.gif"):this.state.isBird2?require("./assets/cycleDoubleLeft.gif"):require("./assets/cycleBoyLeft.gif")}/>
-            {this.state.isBird2&&this.state.isBirdTop&& <Animated.Image 
-            style={{position:'absolute',height:120,width:90,left:birdPosition2,bottom:this.state.isBirdTop?200:110,
-            transform: [{ rotateY: '180deg' }]}}
-            source={require("./assets/birdRight.gif")}/>}
-          <Text style={styles.textScore}>{"Score : "+this.state.score}</Text>
-          </TouchableOpacity >:
-          <TouchableOpacity activeOpacity={1} style={styles.main} onPress={()=>this._onStart()}>
-            <ImageBackground 
-          style={styles.imageDinausorGif}
-          source={require("./assets/movingRoadRight.gif")}
-          >
-          </ImageBackground>
-            <Image 
-            style={{position:'absolute',height:120,width:90,left:100,bottom:110}}
-            source={require("./assets/marioRight.gif")}/>
-                      <Text style={styles.textScore}>{"Last Score : "+this.state.score}</Text>
-          <Text style={styles.textStart}>Touch anywhere to start</Text>
-          </TouchableOpacity>
+    setTimeout(() => {
+      if (this.state.isPlayerTop == this.state.isOponentTop) {
+        this.duration = 5000;
+        this.stopTimeout = 3600;
+        this.stopTimeout2 = 3900;
+        count = 1;
+        SoundPlayer.stop();
+        if (this.state.isMusic) {
+          SoundPlayer.playSoundFile('dilwale', 'mp3');
+          SoundPlayer.seek(4);
+          setInterval(() => {
+            if (this.state.isMusic && this.state.isFailed) {
+              SoundPlayer.stop();
+              SoundPlayer.playSoundFile('dilwale', 'mp3');
+              SoundPlayer.seek(4);
+            }
+          }, 12000);
         }
+        this.setState({isStart: false, isFailed: true});
+      }
+    }, this.stopTimeout);
+    setTimeout(() => {
+      if (this.state.isPlayerTop == this.state.isOponentTop) {
+        this.duration = 5000;
+        this.stopTimeout = 3600;
+        this.stopTimeout2 = 3900;
+        count = 1;
+        SoundPlayer.stop();
+        if (this.state.isMusic) {
+          SoundPlayer.playSoundFile('dilwale', 'mp3');
+          SoundPlayer.seek(4);
+          setInterval(() => {
+            if (this.state.isMusic && this.state.isFailed) {
+              SoundPlayer.stop();
+              SoundPlayer.playSoundFile('dilwale', 'mp3');
+              SoundPlayer.seek(4);
+            }
+          }, 12000);
+        }
+        this.setState({isStart: false, isFailed: true});
+      }
+    }, this.stopTimeout2);
+  };
+
+  render() {
+    const oponentPosition = this.oponentPosition.interpolate({
+      inputRange: [0, 1],
+      outputRange: [moderateScale(900), moderateScale(-100)],
+    });
+
+    return (
+      <SafeAreaView style={styles.container}>
+        {!this.state.isStart && (
+          <TouchableOpacity
+            onPress={() =>
+              this.setState({isMusic: !this.state.isMusic}, SoundPlayer.stop())
+            }
+            style={styles.touchMusic}>
+            <Image
+              style={styles.touchMusic}
+              source={
+                this.state.isMusic
+                  ? require('./assets/musicOn.png')
+                  : require('./assets/musicOff.png')
+              }
+            />
+          </TouchableOpacity>
+        )}
+        {this.state.isFailed && (
+          <TouchableOpacity
+            onPress={() => this._onStart()}
+            style={styles.touchFail}
+          />
+        )}
+        {this.state.isFailed && (
+          <Text style={styles.textGameOver}>Game Over</Text>
+        )}
+        {this.state.isStart ? (
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() =>
+              this.setState({isPlayerTop: !this.state.isPlayerTop})
+            }
+            style={styles.main}>
+            <ImageBackground
+              style={styles.imageRoad}
+              source={require('./assets/movingRoadRight.gif')}></ImageBackground>
+
+            <Image
+              style={[
+                styles.imagePlayer,
+                {
+                  bottom: this.state.isPlayerTop
+                    ? moderateScale(200)
+                    : moderateScale(80),
+                },
+              ]}
+              source={
+                this.state.isPlayerTop
+                  ? require('./assets/superman.gif')
+                  : require('./assets/runningManRight.gif')
+              }
+            />
+            <Animated.Image
+              style={[
+                styles.animatedOponent,
+                {
+                  left: oponentPosition,
+                  bottom: this.state.isOponentTop
+                    ? moderateScale(200)
+                    : moderateScale(80),
+                },
+              ]}
+              source={
+                this.state.isOponentTop
+                  ? this.state.isOponent2
+                    ? require('./assets/birdLeft.gif')
+                    : require('./assets/birdBlackLeft.gif')
+                  : this.state.isOponent2
+                  ? require('./assets/cycleGirlleft.gif')
+                  : require('./assets/cycleBoyLeft.gif')
+              }
+            />
+            <Text style={styles.textScore}>
+              {'Score : ' + this.state.score}
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            activeOpacity={1}
+            style={styles.main}
+            onPress={() => this._onStart()}>
+            <ImageBackground
+              style={styles.imageRoad}
+              source={require('./assets/road.png')}></ImageBackground>
+            <Image
+              style={[styles.imagePlayer, {bottom: moderateScale(80)}]}
+              source={require('./assets/man.png')}
+            />
+            {this.state.isFailed && (
+              <Text style={styles.textScore}>
+                {'Last Score : ' + this.state.score}
+              </Text>
+            )}
+            <Text style={styles.textStart}>Tap to start</Text>
+          </TouchableOpacity>
+        )}
       </SafeAreaView>
     );
   }
-};
+}
 
 const styles = StyleSheet.create({
-  container:{
-    flex:1,
-    backgroundColor:'grey'
+  container: {
+    flex: 1,
+    backgroundColor: 'grey',
   },
-  main:{
-    flex:1
+  main: {
+    flex: 1,
   },
-  imageDinausorGif:{
-    flex:1,
-    // flexDirection:'row',
-    height:"100%",
-    width:"100%",
-    resizeMode:"stretch",
-    justifyContent:'flex-end',
-    transform: [{ rotateY: '180deg' }]
+  touchMusic: {
+    position: 'absolute',
+    height: moderateScale(40),
+    width: moderateScale(40),
+    right: moderateScale(10),
+    bottom: moderateScale(10),
+    zIndex: 3,
   },
-  textStart:{
-    position:'absolute',
-    zIndex:1,
-    bottom:150,
-    alignSelf:'center',
-    fontSize:24,
-    fontWeight:'600',
-    color:'white'
+  touchFail: {
+    zIndex: 1,
+    height: '100%',
+    width: '100%',
+    backgroundColor: 'orange',
+    opacity: 0.2,
+    position: 'absolute',
   },
-  textScore:{
-    position:'absolute',
-    top:20,
-    right:20,
-    zIndex:1,
-    fontSize:24
-  }
+  textGameOver: {
+    position: 'absolute',
+    zIndex: 1,
+    alignSelf: 'center',
+    color: 'green',
+    fontSize: moderateScale(36),
+    top: moderateScale(90),
+    fontWeight: 'bold',
+  },
+  imageRoad: {
+    flex: 1,
+    height: '100%',
+    width: '100%',
+    resizeMode: 'stretch',
+    justifyContent: 'flex-end',
+    transform: [{rotateY: '180deg'}],
+  },
+  imagePlayer: {
+    position: 'absolute',
+    height: moderateScale(80),
+    width: moderateScale(100),
+    left: moderateScale(120),
+    resizeMode: 'stretch',
+  },
+  animatedOponent: {
+    position: 'absolute',
+    height: moderateScale(80),
+    width: moderateScale(70),
+    resizeMode: 'stretch',
+  },
+  textStart: {
+    position: 'absolute',
+    zIndex: 1,
+    bottom: moderateScale(120),
+    alignSelf: 'center',
+    fontSize: moderateScale(22),
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  textScore: {
+    position: 'absolute',
+    top: moderateScale(20),
+    right: moderateScale(20),
+    zIndex: 1,
+    fontSize: moderateScale(24),
+    fontWeight: 'bold',
+  },
 });
 
 export default App;
