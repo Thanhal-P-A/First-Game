@@ -158,7 +158,6 @@ class App extends React.Component {
             onPress={() =>
               this.setState({isMusic: !this.state.isMusic}, SoundPlayer.stop())
             }
-            disabled={this.state.disable}
             style={styles.touchMusic}>
             <Image
               style={styles.touchMusic}
@@ -173,6 +172,7 @@ class App extends React.Component {
         {this.state.isFailed && (
           <TouchableOpacity
             onPress={() => this._onStart()}
+            disabled={this.state.disable}
             style={styles.touchFail}
           />
         )}
