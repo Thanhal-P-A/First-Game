@@ -31,10 +31,8 @@ class App extends React.Component {
       isMusic: true,
       disable:false
     };
-    (this.oponentPosition = new Animated.Value(0)), (this.duration = 3000);
-    this.stopTimeout = 2100;
-    this.stopTimeout2 = 2250;
-    this.stopTimeout3 = 2400;
+    this.oponentPosition = new Animated.Value(0),
+    this.duration = 2500;
   }
 
   componentDidMount() {
@@ -43,14 +41,6 @@ class App extends React.Component {
         SoundPlayer.stop();
       }
     });
-
-    setInterval(() => {
-      if (this.state.isStart) {
-        this.setState({
-          score: this.state.score + 10,
-        });
-      }
-    }, 100);
 
     setInterval(() => {
       if (this.state.isMusic && this.state.isStart) {
@@ -82,6 +72,15 @@ class App extends React.Component {
   };
 
   _animationBird = () => {
+
+    setTimeout(() => {
+      if (this.state.isStart) {
+        this.setState({
+          score: this.state.score + 1,
+        });
+      }
+    }, (this.duration*.82));
+
     if (Math.random() > 0.5) {
       this.setState({isOponentTop: true});
     } else {
@@ -93,12 +92,9 @@ class App extends React.Component {
       this.setState({isOponent2: false});
     }
 
-    if (parseInt(this.state.score) / count > 500) {
+    if ((parseInt(this.state.score) / count > 3)&&this.duration>1200) {
       count = count + 1;
       this.duration = this.duration - 120;
-      this.stopTimeout = (this.duration * .7);
-      this.stopTimeout2 = (this.duration * .75);
-      this.stopTimeout3 = (this.duration * .8);
     }
 
     this.oponentPosition.setValue(0);
@@ -114,10 +110,7 @@ class App extends React.Component {
 
     setTimeout(() => {
       if (this.state.isPlayerTop == this.state.isOponentTop) {
-        this.duration = 3000;
-        this.stopTimeout = 2100;
-        this.stopTimeout2 = 2250;
-        this.stopTimeout3 = 2400;
+        this.duration = 2500;
         count = 1;
         SoundPlayer.stop();
         if (this.state.isMusic) {
@@ -129,14 +122,11 @@ class App extends React.Component {
           this.setState({disable:false})
         }, 1500);
       }
-    }, this.stopTimeout);
+    }, (this.duration * .7));
 
     setTimeout(() => {
       if ((this.state.isPlayerTop == this.state.isOponentTop)&&!this.state.isFailed) {
-        this.duration = 3000;
-        this.stopTimeout = 2100;
-        this.stopTimeout2 = 2250;
-        this.stopTimeout3 = 2400;
+        this.duration = 2500;
         count = 1;
         SoundPlayer.stop();
         if (this.state.isMusic) {
@@ -148,14 +138,11 @@ class App extends React.Component {
           this.setState({disable:false})
         }, 1500);
       }
-    }, this.stopTimeout2);
+    }, (this.duration * .75));
 
     setTimeout(() => {
       if ((this.state.isPlayerTop == this.state.isOponentTop)&&!this.state.isFailed) {
-        this.duration = 5000;
-        this.stopTimeout = 2100;
-        this.stopTimeout2 = 2250;
-        this.stopTimeout3 = 2400;
+        this.duration = 2500;
         count = 1;
         SoundPlayer.stop();
         if (this.state.isMusic) {
@@ -167,7 +154,7 @@ class App extends React.Component {
           this.setState({disable:false})
         }, 1500);
       }
-    }, this.stopTimeout3);
+    }, (this.duration * .8));
   };
 
   render() {
